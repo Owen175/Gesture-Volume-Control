@@ -28,7 +28,7 @@ maxVol = volume.GetVolumeRange()[1]
 while True:
     success, img = cap.read()
     img = detector.findHands(img, draw=False)
-    lmList, indexPosList = detector.findPosition(img, draw=False, indexes=[4,8])
+    indexPosList = detector.findPosition(img, draw=False, indexes=[4,8])
 
     if indexPosList:
         xDistance = indexPosList[0][0] - indexPosList[1][0]
