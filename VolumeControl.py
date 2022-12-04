@@ -6,7 +6,7 @@ import pycaw
 from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-
+import numpy as np
 
 
 pTime = 0
@@ -22,8 +22,8 @@ devices = AudioUtilities.GetSpeakers()
 interface = devices.Activate(
     IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
 volume = cast(interface, POINTER(IAudioEndpointVolume))
-range = -volume.GetVolumeRange()[0]
-
+minVol = volume.GetVolumeRange()[0]
+maxVol = volume.GetVolumeRange()[1]
 
 while True:
     success, img = cap.read()
@@ -36,17 +36,9 @@ while True:
 
         distance = math.sqrt(xDistance**2 + yDistance**2)
 
-
-    if distance > 125:
-        distance = 125
-    distance = distance/125
-    if distance <= 0:
-        distance = 0
-    print(distance)
-
-    distance = int(-50 + (distance * 50))
+    vol = np.interp(distance, [10,120], [minVol, maxVol])
     #print(distance)
-    volume.SetMasterVolumeLevel(distance, None)
+    volume.SetMasterVolumeLevel(vol, None)
 
     cTime = time.time()
     fps = 1/(cTime-pTime)
